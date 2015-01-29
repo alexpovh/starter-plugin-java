@@ -1,0 +1,15 @@
+{
+  "allowedOrigins": [
+    "*"
+  ],
+  "subscribedEvents": [
+    "qbo-transaction"
+  ],
+  "sourcePath": "/index.html",
+  "accessPoints": [
+    {
+      "attachPoint": "_apSettingsSettingsList",
+      "linkText": "My Labs Plugin"
+    }
+  ]
+}

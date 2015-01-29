@@ -1,0 +1,113 @@
+<html>
+<head>
+<style type="text/css">
+  button {
+  border-radius: 2px 0 0;
+  box-sizing: border-box;
+  color: white;
+  background-color: #24479b;
+  width: 250px;
+  height: 65px;
+  font-size: 22px;
+}
+
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script>
+window.addEventListener("message", function(a){
+    if(a.origin.indexOf("intuit.com")>=1&&a.data&&a.data.initXDM)
+    {
+        var b=document.createElement("script");
+        b.setAttribute("type","text/javascript");
+        b.innerHTML=a.data.initXDM;
+        document.getElementsByTagName("head")[0].appendChild(b);
+    }
+});
+
+function getCookie(c_name)
+{
+    var i,x,y,ARRcookies=document.cookie.split(";");
+
+    for (i=0;i<ARRcookies.length;i++)
+    {
+        x=ARRcookies[i].substr(0,ARRcookies[i].indexOf("="));
+        y=ARRcookies[i].substr(ARRcookies[i].indexOf("=")+1);
+        x=x.replace(/^\s+|\s+$/g,"");
+        if (x==c_name)
+        {
+            return unescape(y);
+        }
+     }
+}
+
+var v3ServiceUrl;
+var realmId;
+var ticket = getCookie("qbn.tkt");
+
+qboXDMReady = function() {
+   qboXDM.getContext(function(context) {
+      console.log(context);
+      document.getElementById("custName").value = context.qbo.user.name;
+      v3ServiceUrl = context.qbo.v3ServiceBaseUrl;
+      realmId = context.qbo.realmId;
+   });
+}
+
+showPageMessage = function() {
+    qboXDM.showPageMessage("Hello World", false);
+}
+
+showSimpleDialog = function() {
+    qboXDM.showSimpleOkDialog("Title", "My Own Message", function() { console.log("ok"); });
+}
+
+showVideo = function() {
+    qboXDM.showVideo("Call Me Maybe", "fWNaR-rxAic");
+}
+
+callV3Service = function() {
+  $.ajax({
+    dataType: "json",
+    url: v3ServiceUrl+"companyinfo/"+realmId,
+    beforeSend: function(xhr) {
+      xhr.setRequestHeader("CsrfToken", ticket);
+    },
+    success: function(data) {
+      console.log(data);
+  }});
+}
+
+callMyService = function() {
+	  $.ajax({
+	    dataType: "json",
+	    url: "/api/mycoolservice/v1/sample",
+	    success: function(data) {
+	      console.log(data);
+	  }});	
+}
+
+callSalesTaxService = function() {
+	  $.ajax({
+	    dataType: "json",
+	    url: "/api/mycoolservice/v1/callsalestax?amount="+$("#amount").val(),
+	    success: function(data) {
+	      console.log(data);
+	      $("#totalwithtax").val(data.salesTaxLines.salesTaxLines[0].lineTotal.value);
+	  }});	
+}
+
+</script>
+</head>
+<body>
+   <div style="font-size:36px">Hello Sample!</div><br/><br/>
+   <div style="font-size:18px">Customer Name: <input style="font-size:18px" type="text" id="custName"></input></div><br/>
+   <div style="font-size:18px">Amount: <input id="amount" type="text"></inuput></div><br/>
+   <div style="font-size:18px">Total With Tax: <input id="totalwithtax" readonly type="text"></input></div><br/>
+   <button onclick="showPageMessage();">Show Page Message</button>
+   <button onclick="showSimpleDialog();">Show Dialog</button>
+   <button onclick="showVideo();">Show Video</button>
+   <button onclick="callV3Service();">Call V3 Service</button>
+   <button onclick="callMyService();">Call My Service</button>
+   <button onclick="callSalesTaxService();">Call Sales Tax Service</button>
+</body>
+</html>
